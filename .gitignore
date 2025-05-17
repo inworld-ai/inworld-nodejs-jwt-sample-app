@@ -1,0 +1,21 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# Platform-specific files
+.DS_Store
+
+# Compiled output and packages
+build
+dist
+data-output
+
+# Dependency directories
+node_modules
+
+.env

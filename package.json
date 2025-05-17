@@ -1,0 +1,20 @@
+{
+  "name": "jwt-sample-app",
+  "version": "1.0.0",
+  "description": "Sample app for generating JWT tokens from API key",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "axios": "^1.9.0",
+    "crypto-js": "^4.1.1",
+    "dotenv": "^16.0.3"
+  },
+  "devDependencies": {
+    "@types/crypto-js": "^4.1.1",
+    "@types/node": "^18.11.18",
+    "typescript": "^4.9.4"
+  }
+}
