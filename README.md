@@ -30,8 +30,8 @@ The entire implementation is in `src/index.ts`, making it easy to understand and
 
 2. Create a `.env` file with your Inworld API credentials:
    ```
-   INWORLD_KEY=your_api_key_here
-   INWORLD_SECRET=your_api_secret_here
+   INWORLD_KEY=your_jwt_key_here
+   INWORLD_SECRET=your_jwt_secret_here
    INWORLD_HOST=api.inworld.ai
    INWORLD_WORKSPACE=workspaces/your-workspace-id
    ```
