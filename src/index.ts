@@ -69,7 +69,7 @@ function getSignatureKey(key: string, params: string[]): string {
   return HmacSHA256('iw1_request', signature).toString();
 }
 
-function getAuthorization({ host, apiKey }: { host: string; apiKey: ApiKey }): string {
+function getAuthorization({host, apiKey, engineHost}: { host: string; apiKey: ApiKey, engineHost: string }): string {
   const { key, secret } = apiKey;
   const path = '/ai.inworld.engine.WorldEngine/GenerateToken';
 
@@ -79,7 +79,7 @@ function getAuthorization({ host, apiKey }: { host: string; apiKey: ApiKey }): s
 
   const signature = getSignatureKey(secret, [
     datetime,
-    "api-engine.inworld.ai".replace(':443', ''),
+      engineHost.replace(':443', ''),
     method,
     nonce,
   ]);
@@ -94,8 +94,8 @@ function generateAuthHeader(): string {
   };
   
   const host = process.env.INWORLD_HOST || 'api.inworld.ai';
-  
-  return getAuthorization({ host, apiKey });
+    const engineHost = process.env.INWORLD_ENGINE_HOST || 'api-engine.inworld.ai';
+    return getAuthorization({host, apiKey, engineHost});
 }
 
 // API functions
