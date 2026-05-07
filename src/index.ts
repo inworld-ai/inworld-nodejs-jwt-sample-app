@@ -29,6 +29,25 @@ interface ApiKey {
   secret: string;
 }
 
+// Resolves the API key + secret pair. Prefers INWORLD_API_KEY (the Basic
+// Base64 credential from the Studio API Keys panel); falls back to
+// INWORLD_KEY + INWORLD_SECRET for older .env files.
+function resolveApiKey(): ApiKey {
+  const basic = (process.env.INWORLD_API_KEY || '').trim();
+  if (basic) {
+    const decoded = Buffer.from(basic, 'base64').toString('utf8');
+    const idx = decoded.indexOf(':');
+    const key = idx > 0 ? decoded.slice(0, idx) : '';
+    const secret = idx > 0 ? decoded.slice(idx + 1) : '';
+    if (!key || !secret) throw new Error('INWORLD_API_KEY must be base64 of "<key>:<secret>" (both parts non-empty)');
+    return { key, secret };
+  }
+  const key = (process.env.INWORLD_KEY || '').trim();
+  const secret = (process.env.INWORLD_SECRET || '').trim();
+  if (!key || !secret) throw new Error('Set INWORLD_API_KEY (Basic Base64 from the Studio API Keys panel) or both INWORLD_KEY and INWORLD_SECRET');
+  return { key, secret };
+}
+
 /**
  * JWT Token Response from Inworld API
  * 
@@ -88,11 +107,8 @@ function getAuthorization({host, apiKey, engineHost}: { host: string; apiKey: Ap
 }
 
 function generateAuthHeader(): string {
-  const apiKey: ApiKey = {
-    key: process.env.INWORLD_KEY || '',
-    secret: process.env.INWORLD_SECRET || '',
-  };
-  
+  const apiKey: ApiKey = resolveApiKey();
+
   const host = process.env.INWORLD_HOST || 'api.inworld.ai';
     const engineHost = process.env.INWORLD_ENGINE_HOST || 'api-engine.inworld.ai';
     return getAuthorization({host, apiKey, engineHost});
@@ -102,15 +118,14 @@ function generateAuthHeader(): string {
 async function getJwtToken(): Promise<JwtTokenResponse> {
   const host = process.env.INWORLD_HOST || 'api.inworld.ai';
   const authHeader = generateAuthHeader();
-  const apiKey = process.env.INWORLD_KEY || '';
-  const workspaceName = process.env.INWORLD_WORKSPACE || 'workspaces/default-workspace';
-  
+  const apiKey = resolveApiKey().key;
+
   try {
     const response = await axios.post<JwtTokenResponse>(
       `https://${host}/auth/v1/tokens/token:generate`,
       {
         key: apiKey,
-        resources: [workspaceName]
+        resources: []
       },
       {
         headers: {

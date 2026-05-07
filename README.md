@@ -28,12 +28,10 @@ The entire implementation is in `src/index.ts`, making it easy to understand and
    npm install
    ```
 
-2. Create a `.env` file with your Inworld API credentials:
+2. Create a `.env` file with your Inworld API key:
    ```
-   INWORLD_KEY=your_jwt_key_here
-   INWORLD_SECRET=your_jwt_secret_here
+   INWORLD_API_KEY=your_api_key_here
    INWORLD_HOST=api.inworld.ai
-   INWORLD_WORKSPACE=workspaces/your-workspace-id
    ```
 
 ## Build
@@ -106,7 +104,7 @@ const response = await axios.post<JwtTokenResponse>(
   `https://${host}/auth/v1/tokens/token:generate`,
   {
     key: apiKey,
-    resources: [workspaceName]
+    resources: []
   },
   {
     headers: {
@@ -171,27 +169,25 @@ If you receive a 403 Forbidden error with "invalid authorization signature", con
 
 1. **Check API Credentials**: Ensure your API key and secret are valid and have not expired.
 
-2. **Workspace Name**: The correct format for the workspace name is typically: `workspaces/your-workspace-id`. This should be set in your `.env` file.
-
-3. **API Endpoint**: Verify the token generation endpoint with Inworld's latest documentation. The current implementation uses:
+2. **API Endpoint**: Verify the token generation endpoint with Inworld's latest documentation. The current implementation uses:
    ```
    https://api.inworld.ai/auth/v1/tokens/token:generate
    ```
 
-4. **Authorization Header**: The format of the authorization header is:
+3. **Authorization Header**: The format of the authorization header is:
    ```
    IW1-HMAC-SHA256 ApiKey=your_key,DateTime=YYYYMMDDHHMMSS,Nonce=random_nonce,Signature=signature
    ```
 
-5. **Request Body**: The implementation includes the key and resources in the request body:
+4. **Request Body**: The implementation includes the key in the request body. `resources` is left empty so the token defaults to the workspace the API key belongs to:
    ```json
    {
      "key": "your_api_key",
-     "resources": ["workspaces/your-workspace-id"]
+     "resources": []
    }
    ```
 
-6. **Headers Format**: While HTTP headers are case-insensitive according to the HTTP specification, it's standard practice to use Pascal-case format in documentation. In code, they are typically represented as:
+5. **Headers Format**: While HTTP headers are case-insensitive according to the HTTP specification, it's standard practice to use Pascal-case format in documentation. In code, they are typically represented as:
    ```
    Authorization: IW1-HMAC-SHA256 ...
    Host: api.inworld.ai
