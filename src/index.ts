@@ -29,6 +29,23 @@ interface ApiKey {
   secret: string;
 }
 
+// Resolves the API key + secret pair. Prefers INWORLD_API_KEY (the Basic
+// Base64 credential from the Studio API Keys panel); falls back to
+// INWORLD_KEY + INWORLD_SECRET for older .env files.
+function resolveApiKey(): ApiKey {
+  const basic = (process.env.INWORLD_API_KEY || '').trim();
+  if (basic) {
+    const decoded = Buffer.from(basic, 'base64').toString('utf8');
+    const idx = decoded.indexOf(':');
+    if (idx <= 0) throw new Error('INWORLD_API_KEY must be base64 of "<key>:<secret>"');
+    return { key: decoded.slice(0, idx), secret: decoded.slice(idx + 1) };
+  }
+  return {
+    key: process.env.INWORLD_KEY || '',
+    secret: process.env.INWORLD_SECRET || '',
+  };
+}
+
 /**
  * JWT Token Response from Inworld API
  * 
@@ -88,11 +105,8 @@ function getAuthorization({host, apiKey, engineHost}: { host: string; apiKey: Ap
 }
 
 function generateAuthHeader(): string {
-  const apiKey: ApiKey = {
-    key: process.env.INWORLD_KEY || '',
-    secret: process.env.INWORLD_SECRET || '',
-  };
-  
+  const apiKey: ApiKey = resolveApiKey();
+
   const host = process.env.INWORLD_HOST || 'api.inworld.ai';
     const engineHost = process.env.INWORLD_ENGINE_HOST || 'api-engine.inworld.ai';
     return getAuthorization({host, apiKey, engineHost});
@@ -102,7 +116,7 @@ function generateAuthHeader(): string {
 async function getJwtToken(): Promise<JwtTokenResponse> {
   const host = process.env.INWORLD_HOST || 'api.inworld.ai';
   const authHeader = generateAuthHeader();
-  const apiKey = process.env.INWORLD_KEY || '';
+  const apiKey = resolveApiKey().key;
   const workspaceName = process.env.INWORLD_WORKSPACE || 'workspaces/default-workspace';
   
   try {

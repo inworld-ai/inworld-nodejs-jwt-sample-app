@@ -28,10 +28,9 @@ The entire implementation is in `src/index.ts`, making it easy to understand and
    npm install
    ```
 
-2. Create a `.env` file with your Inworld API credentials:
+2. Create a `.env` file with your Inworld API key:
    ```
-   INWORLD_KEY=your_jwt_key_here
-   INWORLD_SECRET=your_jwt_secret_here
+   INWORLD_API_KEY=<paste the Basic (Base64) value from your Studio API Keys panel>
    INWORLD_HOST=api.inworld.ai
    INWORLD_WORKSPACE=workspaces/your-workspace-id
    ```
