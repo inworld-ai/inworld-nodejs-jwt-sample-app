@@ -119,14 +119,13 @@ async function getJwtToken(): Promise<JwtTokenResponse> {
   const host = process.env.INWORLD_HOST || 'api.inworld.ai';
   const authHeader = generateAuthHeader();
   const apiKey = resolveApiKey().key;
-  const workspaceName = process.env.INWORLD_WORKSPACE || 'workspaces/default-workspace';
-  
+
   try {
     const response = await axios.post<JwtTokenResponse>(
       `https://${host}/auth/v1/tokens/token:generate`,
       {
         key: apiKey,
-        resources: [workspaceName]
+        resources: []
       },
       {
         headers: {
