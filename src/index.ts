@@ -37,13 +37,15 @@ function resolveApiKey(): ApiKey {
   if (basic) {
     const decoded = Buffer.from(basic, 'base64').toString('utf8');
     const idx = decoded.indexOf(':');
-    if (idx <= 0) throw new Error('INWORLD_API_KEY must be base64 of "<key>:<secret>"');
-    return { key: decoded.slice(0, idx), secret: decoded.slice(idx + 1) };
+    const key = idx > 0 ? decoded.slice(0, idx) : '';
+    const secret = idx > 0 ? decoded.slice(idx + 1) : '';
+    if (!key || !secret) throw new Error('INWORLD_API_KEY must be base64 of "<key>:<secret>" (both parts non-empty)');
+    return { key, secret };
   }
-  return {
-    key: process.env.INWORLD_KEY || '',
-    secret: process.env.INWORLD_SECRET || '',
-  };
+  const key = (process.env.INWORLD_KEY || '').trim();
+  const secret = (process.env.INWORLD_SECRET || '').trim();
+  if (!key || !secret) throw new Error('Set INWORLD_API_KEY (Basic Base64 from the Studio API Keys panel) or both INWORLD_KEY and INWORLD_SECRET');
+  return { key, secret };
 }
 
 /**
